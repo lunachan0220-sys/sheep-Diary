@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>绵羊日记 3.6</title>
+    <title>绵羊日记 3.7</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -137,23 +137,19 @@
         }
         .save-btn:active { transform: scale(0.98); }
 
-        /* --- Page 2: Reflection (升级文本框) --- */
+        /* --- Page 2: Reflection (样式调整) --- */
         .reflection-input-group { display: flex; gap: 10px; margin-bottom: 25px; align-items: flex-start; }
         
-        /* 修改后的反思输入框：支持多行 */
         .reflection-input {
             flex: 1; border: 2px solid #EAF4F4; background: white;
             border-radius: 15px; padding: 14px; font-size: 15px; outline: none; color: #5A4A42;
-            height: 50px; /* 增加默认高度 */
-            resize: none; /* 禁止手动拖拽 */
-            font-family: inherit;
+            height: 50px; resize: none; font-family: inherit;
         }
         .reflection-input:focus { border-color: var(--reflection-color); }
         
         .reflection-add-btn {
             background: var(--reflection-color); color: white; border: none;
-            width: 50px; height: 50px; /* 匹配输入框高度 */
-            border-radius: 15px; font-size: 20px; cursor: pointer;
+            width: 50px; height: 50px; border-radius: 15px; font-size: 20px; cursor: pointer;
         }
         
         .task-item {
@@ -172,13 +168,27 @@
             background: var(--reflection-color); border-color: var(--reflection-color);
         }
         .task-checkbox.checked::after { content: '✓'; color: white; font-size: 14px; font-weight: bold; }
+        
+        /* 核心修改：已完成任务的样式 */
         .task-text { flex: 1; line-height: 1.5; color: #555; word-wrap: break-word; }
         .task-delete { color: #DDD; padding: 0 5px; cursor: pointer; margin-left: 10px; font-size: 14px; margin-top: 2px;}
         .task-meta { font-size: 11px; color: #BBB; margin-top: 6px; margin-left: 38px; }
+        
         .completed-section { margin-top: 40px; border-top: 2px dashed #EEE; padding-top: 20px; }
         .completed-title { font-size: 14px; color: #BBB; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        .task-item.completed { opacity: 0.7; background: #F9F9F9; box-shadow: none; }
-        .task-item.completed .task-text { text-decoration: line-through; color: #AAA; }
+        
+        /* 修改点：完成后的样式 */
+        .task-item.completed { 
+            opacity: 1; /* 不透明 */
+            background: #F4FAFF; /* 淡淡的蓝色/金色背景 */
+            border: 1px solid #E3F2FD;
+            box-shadow: none; 
+        }
+        .task-item.completed .task-text { 
+            text-decoration: none; /* 【重要】去掉删除线 */
+            color: #5A4A42; /* 保持文字清晰 */
+            font-weight: 500;
+        }
 
         /* --- 日历 --- */
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -373,8 +383,8 @@
                 memoriesTitle: "回忆旅程 🌟",
                 navJournal: "日记",
                 navMemories: "回忆",
-                navReflection: "反思", // 简化文案
-                reflectionTitle: "反思 🌱", // 简化文案
+                navReflection: "反思",
+                reflectionTitle: "反思 🌱",
                 reflectionPlaceholder: "我要改变的是...",
                 completedTitle: "已完成的改变",
                 weekdays: ["一", "二", "三", "四", "五", "六", "日"],
@@ -544,8 +554,12 @@
 
             tasks.forEach(task => {
                 let dateHtml = '';
+                // 核心修改：加冕皇冠
+                let crownHtml = '';
+                
                 if (task.completed) {
                     dateHtml = `<div class="task-meta">🎉 ${t.completedOn} ${task.completeDate || '?'}</div>`;
+                    crownHtml = '👑 '; // 增加皇冠前缀
                 } else {
                     dateHtml = `<div class="task-meta">📅 ${t.createdOn} ${task.createDate || '?'}</div>`;
                 }
@@ -554,7 +568,8 @@
                     <div class="task-item ${task.completed ? 'completed' : ''}">
                         <div class="task-main">
                             <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id})"></div>
-                            <div class="task-text">${task.text.replace(/\n/g, '<br>')}</div> <div class="task-delete" onclick="deleteTask(${task.id})"><i class="fa-solid fa-xmark"></i></div>
+                            <div class="task-text">${crownHtml}${task.text.replace(/\n/g, '<br>')}</div>
+                            <div class="task-delete" onclick="deleteTask(${task.id})"><i class="fa-solid fa-xmark"></i></div>
                         </div>
                         ${dateHtml}
                     </div>
