@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>绵羊日记 3.4</title>
+    <title>绵羊日记 3.5</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -138,7 +138,7 @@
         }
         .save-btn:active { transform: scale(0.98); }
 
-        /* --- Page 2: Reflection (反思) --- */
+        /* --- Page 2: Reflection --- */
         .reflection-input-group { display: flex; gap: 10px; margin-bottom: 25px; }
         .reflection-input {
             flex: 1; border: 2px solid #EAF4F4; background: white;
@@ -154,10 +154,9 @@
             display: flex; align-items: flex-start; background: white;
             padding: 15px; border-radius: 16px; margin-bottom: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.3s ease;
-            flex-direction: column; /* 改为纵向布局以容纳日期 */
+            flex-direction: column;
         }
         .task-main { display: flex; width: 100%; align-items: flex-start; }
-
         .task-checkbox {
             width: 22px; height: 22px; border-radius: 6px; border: 2px solid #DDD;
             margin-right: 12px; cursor: pointer; position: relative; flex-shrink: 0;
@@ -166,16 +165,10 @@
         .task-checkbox.checked {
             background: var(--reflection-color); border-color: var(--reflection-color);
         }
-        .task-checkbox.checked::after {
-            content: '✓'; color: white; font-size: 14px; font-weight: bold;
-        }
+        .task-checkbox.checked::after { content: '✓'; color: white; font-size: 14px; font-weight: bold; }
         .task-text { flex: 1; line-height: 1.5; color: #555; }
         .task-delete { color: #DDD; padding: 0 5px; cursor: pointer; margin-left: 10px; font-size: 14px;}
-        
-        .task-meta {
-            font-size: 11px; color: #BBB; margin-top: 6px; margin-left: 38px;
-        }
-        
+        .task-meta { font-size: 11px; color: #BBB; margin-top: 6px; margin-left: 38px; }
         .completed-section { margin-top: 40px; border-top: 2px dashed #EEE; padding-top: 20px; }
         .completed-title { font-size: 14px; color: #BBB; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
         .task-item.completed { opacity: 0.7; background: #F9F9F9; box-shadow: none; }
@@ -194,12 +187,13 @@
         }
         .day-cell.today { border: 2px solid var(--accent-color); color: var(--accent-color); font-weight: bold; }
         
-        /* 羊与心 */
+        /* 羊与心样式 */
         .day-cell.has-sheep { background: #FFFDF5; border: 1px solid #FFE4D0; color: #5A4A42; }
-        .day-cell.is-special { background: #FFF0F5; border: 1px solid #FFC2D1; color: #D63384; } /* 特别日背景 */
+        .day-cell.is-special { background: #FFF0F5; border: 1px solid #FFC2D1; color: #D63384; }
         
-        .sheep-icon { font-size: 16px; line-height: 1; margin-top: 2px; }
-        .heart-icon { font-size: 14px; line-height: 1; margin-top: 2px; animation: pop 0.5s ease; }
+        /* 这里改成了 Emoji，确保 100% 显示 */
+        .sheep-icon { font-size: 18px; line-height: 1; margin-top: 2px; animation: pop 0.4s ease; }
+        .heart-icon { font-size: 16px; line-height: 1; margin-top: 2px; animation: pop 0.5s ease; }
 
         /* --- 回忆 --- */
         .memory-timeline { position: relative; padding-left: 20px; border-left: 2px solid #EEE; margin-left: 10px; margin-top: 20px;}
@@ -212,7 +206,7 @@
         .memory-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
         .memory-date { font-size: 14px; font-weight: bold; color: #B0A095; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; }
         .memory-mood { font-size: 16px; animation: pop 0.5s ease; }
-        .memory-special { color: var(--special-color); font-size: 14px; } /* 回忆里的爱心 */
+        .memory-special { color: var(--special-color); font-size: 14px; }
 
         .memory-content { 
             background: white; padding: 20px; border-radius: 20px; 
@@ -478,26 +472,26 @@
                 if (t[key]) el.placeholder = t[key];
             });
             renderCalendar();
-            renderReflectionList(); // 重新渲染反思列表以更新日期语言
+            renderReflectionList();
             if(document.getElementById('page-tracking').classList.contains('active')) {
                 renderTimeline();
             }
         }
 
-        // --- 反思 (Reflection) 升级版 ---
+        // --- 反思 (Reflection) ---
         function addReflectionTask() {
             const input = document.getElementById('reflection-input');
             const text = input.value.trim();
             if (!text) return;
 
             const now = new Date();
-            const dateStr = now.toLocaleDateString(); // 记录简单的日期格式
+            const dateStr = now.toLocaleDateString();
 
             const task = {
                 id: Date.now(),
                 text: text,
                 completed: false,
-                createDate: dateStr, // 创建时间
+                createDate: dateStr,
                 completeDate: null
             };
 
@@ -514,7 +508,6 @@
             const task = tasks.find(t => t.id === id);
             if (task) {
                 task.completed = !task.completed;
-                // 如果完成了，记录今天的时间；如果取消完成，清空时间
                 if(task.completed) {
                     task.completeDate = new Date().toLocaleDateString();
                 } else {
@@ -543,7 +536,6 @@
             completedContainer.innerHTML = '';
 
             tasks.forEach(task => {
-                // 根据状态显示不同的时间
                 let dateHtml = '';
                 if (task.completed) {
                     dateHtml = `<div class="task-meta">🎉 ${t.completedOn} ${task.completeDate || '?'}</div>`;
@@ -570,7 +562,7 @@
             });
         }
 
-        // --- 日记与特别日 ---
+        // --- 日记 ---
         function addInputField() {
             inputCount++;
             const container = document.getElementById('input-container');
@@ -606,8 +598,9 @@
             const radioMood = document.querySelector('input[name="mood"]:checked');
             let finalMood = customMood || (radioMood ? radioMood.value : "😊"); 
             
-            // 获取特别日开关状态
-            const isSpecial = document.getElementById('special-toggle').checked;
+            // 严谨获取开关状态
+            const specialToggle = document.getElementById('special-toggle');
+            const isSpecial = specialToggle ? specialToggle.checked : false;
 
             if (contentList.length === 0 && longDiaryContent === "") { 
                 alert(t.alertEmpty); return; 
@@ -622,7 +615,7 @@
                 items: contentList,
                 longDiary: longDiaryContent,
                 mood: finalMood, 
-                isSpecial: isSpecial, // 保存特别状态
+                isSpecial: isSpecial, 
                 timestamp: Date.now()
             };
             
@@ -633,7 +626,7 @@
             longDiaryInput.value = '';
             document.getElementById('custom-mood-input').value = '';
             document.querySelectorAll('input[name="mood"]')[0].checked = true;
-            document.getElementById('special-toggle').checked = false; // 重置开关
+            if(specialToggle) specialToggle.checked = false; // 自动关闭开关
 
             updateSheepCount();
             renderCalendar();
@@ -680,18 +673,18 @@
                 }
                 const dateKey = `${year}-${month+1}-${day}`;
                 
-                // --- 渲染逻辑升级 ---
+                // --- 渲染逻辑 (修复后：使用 Emoji 🐑) ---
                 if (entries[dateKey]) {
                     const data = entries[dateKey];
                     
-                    if (data.isSpecial) {
-                        // 特别日：显示粉色背景和爱心
+                    if (data.isSpecial === true) {
+                        // 特别日：💗
                         cell.classList.add('is-special');
                         cell.innerHTML = `<span>${day}</span><div class="heart-icon">💗</div>`;
                     } else {
-                        // 普通日：显示羊
+                        // 普通日：🐑 (Emoji)
                         cell.classList.add('has-sheep');
-                        cell.innerHTML = `<span>${day}</span><div class="sheep-icon"><i class="fa-solid fa-sheep"></i></div>`;
+                        cell.innerHTML = `<span>${day}</span><div class="sheep-icon">🐑</div>`;
                     }
                     
                     cell.onclick = () => {
@@ -731,7 +724,6 @@
                 const items = Array.isArray(data.items) ? data.items : [];
                 const mood = data.mood || ''; 
                 
-                // 回忆里也显示特别爱心
                 const specialIcon = data.isSpecial ? '<i class="fa-solid fa-heart memory-special"></i>' : '';
 
                 let listHtml = items.map((text, idx) => `
