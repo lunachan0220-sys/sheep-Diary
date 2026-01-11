@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>绵羊日记 </title>
+    <title>绵羊日记</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -828,11 +828,18 @@
             renderTimeline();
         }
 
-        // 新增：重置日期筛选
         function resetDateFilter() {
             document.getElementById('filter-start-date').value = '';
             document.getElementById('filter-end-date').value = '';
             renderTimeline();
+        }
+
+        // 精准日期转换函数
+        function parseDate(str) {
+            if(!str) return null;
+            const p = str.split('-');
+            // 创建本地时间的 00:00:00
+            return new Date(p[0], p[1]-1, p[2]);
         }
 
         function renderTimeline() {
@@ -841,23 +848,23 @@
             const sortedKeys = Object.keys(entries).sort((a,b) => new Date(b) - new Date(a));
             const t = translations[currentLang];
 
-            // 获取日期筛选值
+            // 获取输入框的值
             const startVal = document.getElementById('filter-start-date').value;
             const endVal = document.getElementById('filter-end-date').value;
-            const startDate = startVal ? new Date(startVal) : null;
-            const endDate = endVal ? new Date(endVal) : null;
+            
+            // 转换为日期对象
+            const startDate = parseDate(startVal);
+            const endDate = parseDate(endVal);
 
             container.innerHTML = '';
 
             let hasContent = false;
 
             sortedKeys.forEach((dateKey, index) => {
-                // 日期筛选逻辑
+                // 精准比较
                 if (startDate || endDate) {
-                    const currentEntryDate = new Date(dateKey);
-                    // 如果设置了开始日期，且当前日期小于开始日期，跳过
+                    const currentEntryDate = parseDate(dateKey); // 确保格式一致
                     if (startDate && currentEntryDate < startDate) return;
-                    // 如果设置了结束日期，且当前日期大于结束日期，跳过
                     if (endDate && currentEntryDate > endDate) return;
                 }
 
