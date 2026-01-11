@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>绵羊日记 3.5</title>
+    <title>绵羊日记 3.6</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -11,7 +11,7 @@
             --text-color: #5A4A42;
             --accent-color: #F8C444; 
             --reflection-color: #88CCF1; 
-            --special-color: #FF8FAB; /* 粉色爱心色 */
+            --special-color: #FF8FAB; 
             --grey-color: #E0E0E0;
             --card-shadow: 0 8px 20px rgba(248, 196, 68, 0.15);
             --nav-height: 80px;
@@ -115,7 +115,6 @@
         }
         .special-label { font-size: 14px; font-weight: bold; color: #5A4A42; display: flex; align-items: center; gap: 8px;}
         
-        /* 开关按钮 CSS */
         .switch { position: relative; display: inline-block; width: 46px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
@@ -138,16 +137,23 @@
         }
         .save-btn:active { transform: scale(0.98); }
 
-        /* --- Page 2: Reflection --- */
-        .reflection-input-group { display: flex; gap: 10px; margin-bottom: 25px; }
+        /* --- Page 2: Reflection (升级文本框) --- */
+        .reflection-input-group { display: flex; gap: 10px; margin-bottom: 25px; align-items: flex-start; }
+        
+        /* 修改后的反思输入框：支持多行 */
         .reflection-input {
             flex: 1; border: 2px solid #EAF4F4; background: white;
             border-radius: 15px; padding: 14px; font-size: 15px; outline: none; color: #5A4A42;
+            height: 50px; /* 增加默认高度 */
+            resize: none; /* 禁止手动拖拽 */
+            font-family: inherit;
         }
         .reflection-input:focus { border-color: var(--reflection-color); }
+        
         .reflection-add-btn {
             background: var(--reflection-color); color: white; border: none;
-            width: 50px; border-radius: 15px; font-size: 20px; cursor: pointer;
+            width: 50px; height: 50px; /* 匹配输入框高度 */
+            border-radius: 15px; font-size: 20px; cursor: pointer;
         }
         
         .task-item {
@@ -160,14 +166,14 @@
         .task-checkbox {
             width: 22px; height: 22px; border-radius: 6px; border: 2px solid #DDD;
             margin-right: 12px; cursor: pointer; position: relative; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; align-items: center; justify-content: center; margin-top: 2px;
         }
         .task-checkbox.checked {
             background: var(--reflection-color); border-color: var(--reflection-color);
         }
         .task-checkbox.checked::after { content: '✓'; color: white; font-size: 14px; font-weight: bold; }
-        .task-text { flex: 1; line-height: 1.5; color: #555; }
-        .task-delete { color: #DDD; padding: 0 5px; cursor: pointer; margin-left: 10px; font-size: 14px;}
+        .task-text { flex: 1; line-height: 1.5; color: #555; word-wrap: break-word; }
+        .task-delete { color: #DDD; padding: 0 5px; cursor: pointer; margin-left: 10px; font-size: 14px; margin-top: 2px;}
         .task-meta { font-size: 11px; color: #BBB; margin-top: 6px; margin-left: 38px; }
         .completed-section { margin-top: 40px; border-top: 2px dashed #EEE; padding-top: 20px; }
         .completed-title { font-size: 14px; color: #BBB; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
@@ -186,12 +192,8 @@
             font-size: 14px; position: relative; color: #888;
         }
         .day-cell.today { border: 2px solid var(--accent-color); color: var(--accent-color); font-weight: bold; }
-        
-        /* 羊与心样式 (优化后) */
         .day-cell.has-sheep { background: #FFFDF5; border: 1px solid #FFE4D0; color: #5A4A42; }
         .day-cell.is-special { background: #FFF0F5; border: 1px solid #FFC2D1; color: #D63384; }
-        
-        /* 使用 Emoji 替代 FontAwesome 图标 */
         .sheep-icon { font-size: 18px; line-height: 1; margin-top: 2px; animation: pop 0.4s ease; }
         .heart-icon { font-size: 16px; line-height: 1; margin-top: 2px; animation: pop 0.5s ease; }
 
@@ -282,10 +284,15 @@
                 <span class="mood-label" data-i18n="moodLabel">今天的心情是...</span>
                 <div class="mood-container">
                     <label><input type="radio" name="mood" value="😊" class="mood-radio" checked><div class="mood-btn">😊</div></label>
-                    <label><input type="radio" name="mood" value="😌" class="mood-radio"><div class="mood-btn">😌</div></label>
-                    <label><input type="radio" name="mood" value="😔" class="mood-radio"><div class="mood-btn">😔</div></label>
+                    <label><input type="radio" name="mood" value="😆" class="mood-radio"><div class="mood-btn">😆</div></label>
+                    <label><input type="radio" name="mood" value="😍" class="mood-radio"><div class="mood-btn">😍</div></label>
                     <label><input type="radio" name="mood" value="🥳" class="mood-radio"><div class="mood-btn">🥳</div></label>
+                    <label><input type="radio" name="mood" value="😌" class="mood-radio"><div class="mood-btn">😌</div></label>
+                    <label><input type="radio" name="mood" value="😐" class="mood-radio"><div class="mood-btn">😐</div></label>
+                    <label><input type="radio" name="mood" value="🥺" class="mood-radio"><div class="mood-btn">🥺</div></label>
+                    <label><input type="radio" name="mood" value="😔" class="mood-radio"><div class="mood-btn">😔</div></label>
                     <label><input type="radio" name="mood" value="😫" class="mood-radio"><div class="mood-btn">😫</div></label>
+                    <label><input type="radio" name="mood" value="😠" class="mood-radio"><div class="mood-btn">😠</div></label>
                     <input type="text" id="custom-mood-input" class="custom-mood-input" placeholder="?" maxlength="2" oninput="clearRadios()">
                 </div>
             </div>
@@ -318,10 +325,10 @@
     </div>
 
     <div id="page-reflection" class="page">
-        <h2 style="margin: 10px 0 20px 10px; color: #4A3B32; font-size: 22px;" data-i18n="reflectionTitle">My Growth 🌱</h2>
+        <h2 style="margin: 10px 0 20px 10px; color: #4A3B32; font-size: 22px;" data-i18n="reflectionTitle">Reflection 🌱</h2>
         
         <div class="reflection-input-group">
-            <input type="text" id="reflection-input" class="reflection-input" placeholder="需要改变的是..." data-i18n-placeholder="reflectionPlaceholder">
+            <textarea id="reflection-input" class="reflection-input" placeholder="需要改变的是..." data-i18n-placeholder="reflectionPlaceholder"></textarea>
             <button class="reflection-add-btn" onclick="addReflectionTask()"><i class="fa-solid fa-plus"></i></button>
         </div>
 
@@ -366,8 +373,8 @@
                 memoriesTitle: "回忆旅程 🌟",
                 navJournal: "日记",
                 navMemories: "回忆",
-                navReflection: "反思",
-                reflectionTitle: "每日反思 🌱",
+                navReflection: "反思", // 简化文案
+                reflectionTitle: "反思 🌱", // 简化文案
                 reflectionPlaceholder: "我要改变的是...",
                 completedTitle: "已完成的改变",
                 weekdays: ["一", "二", "三", "四", "五", "六", "日"],
@@ -392,7 +399,7 @@
                 navJournal: "日記",
                 navMemories: "回憶",
                 navReflection: "反思",
-                reflectionTitle: "每日反思 🌱",
+                reflectionTitle: "反思 🌱",
                 reflectionPlaceholder: "我要改變的是...",
                 completedTitle: "已完成的改變",
                 weekdays: ["一", "二", "三", "四", "五", "六", "日"],
@@ -417,7 +424,7 @@
                 navJournal: "Journal",
                 navMemories: "Memories",
                 navReflection: "Growth",
-                reflectionTitle: "Self Reflection 🌱",
+                reflectionTitle: "Reflection 🌱",
                 reflectionPlaceholder: "I need to improve...",
                 completedTitle: "Achievements",
                 weekdays: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
@@ -547,8 +554,7 @@
                     <div class="task-item ${task.completed ? 'completed' : ''}">
                         <div class="task-main">
                             <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id})"></div>
-                            <div class="task-text">${task.text}</div>
-                            <div class="task-delete" onclick="deleteTask(${task.id})"><i class="fa-solid fa-xmark"></i></div>
+                            <div class="task-text">${task.text.replace(/\n/g, '<br>')}</div> <div class="task-delete" onclick="deleteTask(${task.id})"><i class="fa-solid fa-xmark"></i></div>
                         </div>
                         ${dateHtml}
                     </div>
@@ -598,7 +604,6 @@
             const radioMood = document.querySelector('input[name="mood"]:checked');
             let finalMood = customMood || (radioMood ? radioMood.value : "😊"); 
             
-            // 严谨获取开关状态
             const specialToggle = document.getElementById('special-toggle');
             const isSpecial = specialToggle ? specialToggle.checked : false;
 
@@ -621,12 +626,11 @@
             
             localStorage.setItem('sheep_diary_v3', JSON.stringify(entries));
             
-            // 重置
             inputs.forEach(input => input.value = ''); 
             longDiaryInput.value = '';
             document.getElementById('custom-mood-input').value = '';
             document.querySelectorAll('input[name="mood"]')[0].checked = true;
-            if(specialToggle) specialToggle.checked = false; // 自动关闭开关
+            if(specialToggle) specialToggle.checked = false;
 
             updateSheepCount();
             renderCalendar();
@@ -673,20 +677,15 @@
                 }
                 const dateKey = `${year}-${month+1}-${day}`;
                 
-                // --- 渲染逻辑 (修复后：使用 Emoji 🐑) ---
                 if (entries[dateKey]) {
                     const data = entries[dateKey];
-                    
                     if (data.isSpecial === true) {
-                        // 特别日：💗
                         cell.classList.add('is-special');
                         cell.innerHTML = `<span>${day}</span><div class="heart-icon">💗</div>`;
                     } else {
-                        // 普通日：🐑 (Emoji)
                         cell.classList.add('has-sheep');
                         cell.innerHTML = `<span>${day}</span><div class="sheep-icon">🐑</div>`;
                     }
-                    
                     cell.onclick = () => {
                         let msg = `📅 ${dateKey} (${data.mood || ''})\n\n`; 
                         if(data.items) msg += data.items.map((txt,i)=>`${i+1}. ${txt}`).join('\n');
@@ -723,7 +722,6 @@
                 const data = entries[dateKey];
                 const items = Array.isArray(data.items) ? data.items : [];
                 const mood = data.mood || ''; 
-                
                 const specialIcon = data.isSpecial ? '<i class="fa-solid fa-heart memory-special"></i>' : '';
 
                 let listHtml = items.map((text, idx) => `
