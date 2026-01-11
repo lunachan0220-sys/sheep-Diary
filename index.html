@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>绵羊日记 3.9</title>
+    <title>绵羊日记 </title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -150,6 +150,11 @@
             width: 50px; height: 50px; border-radius: 15px; font-size: 20px; cursor: pointer;
         }
         
+        .section-header { 
+            font-size: 14px; color: #BBB; font-weight: bold; margin: 25px 0 10px 5px; 
+            text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px;
+        }
+
         .task-item {
             display: flex; align-items: flex-start; background: white;
             padding: 15px; border-radius: 16px; margin-bottom: 12px;
@@ -169,8 +174,7 @@
         .task-text { flex: 1; line-height: 1.5; color: #555; word-wrap: break-word; }
         .task-delete { color: #DDD; padding: 0 5px; cursor: pointer; margin-left: 10px; font-size: 14px; margin-top: 2px;}
         .task-meta { font-size: 11px; color: #BBB; margin-top: 6px; margin-left: 38px; }
-        .completed-section { margin-top: 40px; border-top: 2px dashed #EEE; padding-top: 20px; }
-        .completed-title { font-size: 14px; color: #BBB; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        
         .task-item.completed { opacity: 1; background: #F4FAFF; border: 1px solid #E3F2FD; box-shadow: none; }
         .task-item.completed .task-text { text-decoration: none; color: #5A4A42; font-weight: 500; }
 
@@ -204,7 +208,7 @@
 
         /* --- 回忆 (Memory) Filter --- */
         .filter-bar {
-            display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; padding: 0 10px;
+            display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; padding: 0 10px;
         }
         .filter-btn {
             background: #FFF; border: 1px solid #EEE; color: #888;
@@ -214,6 +218,21 @@
         .filter-btn.active.filter-default { background: var(--accent-color); color: white; border-color: var(--accent-color); }
         .filter-btn.active.filter-reflection { background: var(--reflection-color); color: white; border-color: var(--reflection-color); }
         .filter-btn.active.filter-special { background: var(--special-color); color: white; border-color: var(--special-color); }
+
+        /* 日期选择器 */
+        .date-filter-container {
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            margin-bottom: 25px; padding: 0 10px;
+        }
+        .date-input {
+            border: 1px solid #EEE; background: white; border-radius: 10px;
+            padding: 6px 10px; font-size: 12px; color: #555; outline: none;
+            font-family: inherit;
+        }
+        .reset-date-btn {
+            background: #EEE; border: none; width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; color: #888;
+        }
 
         .memory-timeline { position: relative; padding-left: 20px; border-left: 2px solid #EEE; margin-left: 10px; margin-top: 20px;}
         .memory-item { position: relative; margin-bottom: 35px; }
@@ -247,7 +266,6 @@
             cursor: pointer; margin-top: 5px;
         }
 
-        /* 反思日记在 Memory 中的特殊样式 */
         .reflection-tag {
             display: inline-block; background: #E3F2FD; color: #1565C0;
             font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-bottom: 8px; font-weight: bold;
@@ -356,12 +374,11 @@
             <button class="reflection-add-btn" onclick="addReflectionTask()"><i class="fa-solid fa-plus"></i></button>
         </div>
 
+        <div class="section-header" data-i18n="todoTitle">未完成 📝</div>
         <div id="todo-list"></div>
 
-        <div class="completed-section">
-            <div class="completed-title" data-i18n="completedTitle">Achievements</div>
-            <div id="completed-list"></div>
-        </div>
+        <div class="section-header" style="margin-top: 30px;" data-i18n="completedTitle">已完成 👑</div>
+        <div id="completed-list"></div>
 
         <div class="reflection-journal-card">
             <h3 style="margin: 0 0 10px 0; color: #1565C0; font-size: 16px;" data-i18n="reflectionDiaryTitle">Reflection Diary 🙏</h3>
@@ -377,6 +394,15 @@
             <button class="filter-btn active filter-default" onclick="setFilter('default')" data-i18n="filterDiary">📅 日记</button>
             <button class="filter-btn filter-reflection" onclick="setFilter('reflection')" data-i18n="filterReflection">🙏 反思</button>
             <button class="filter-btn filter-special" onclick="setFilter('special')" data-i18n="filterSpecial">💗 特别</button>
+        </div>
+
+        <div class="date-filter-container">
+            <input type="date" id="filter-start-date" class="date-input" onchange="renderTimeline()">
+            <span style="font-size:12px; color:#888;">-</span>
+            <input type="date" id="filter-end-date" class="date-input" onchange="renderTimeline()">
+            <button class="reset-date-btn" onclick="resetDateFilter()">
+                <i class="fa-solid fa-rotate-left" style="font-size:12px;"></i>
+            </button>
         </div>
 
         <div id="memory-timeline" class="memory-timeline"></div>
@@ -413,7 +439,8 @@
                 navReflection: "反思",
                 reflectionTitle: "反思 🌱",
                 reflectionPlaceholder: "我要改变的是...",
-                completedTitle: "已完成的改变",
+                todoTitle: "未完成 📝",
+                completedTitle: "已完成 👑",
                 weekdays: ["一", "二", "三", "四", "五", "六", "日"],
                 months: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
                 alertEmpty: "写点什么才能领绵羊哦！🐑",
@@ -444,7 +471,8 @@
                 navReflection: "反思",
                 reflectionTitle: "反思 🌱",
                 reflectionPlaceholder: "我要改變的是...",
-                completedTitle: "已完成的改變",
+                todoTitle: "未完成 📝",
+                completedTitle: "已完成 👑",
                 weekdays: ["一", "二", "三", "四", "五", "六", "日"],
                 months: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
                 alertEmpty: "寫點什麼才能領綿羊哦！🐑",
@@ -475,7 +503,8 @@
                 navReflection: "Growth",
                 reflectionTitle: "Reflection 🌱",
                 reflectionPlaceholder: "I need to improve...",
-                completedTitle: "Achievements",
+                todoTitle: "In Progress 📝",
+                completedTitle: "Achievements 👑",
                 weekdays: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
                 months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
                 alertEmpty: "Write something to get a sheep! 🐑",
@@ -799,17 +828,39 @@
             renderTimeline();
         }
 
+        // 新增：重置日期筛选
+        function resetDateFilter() {
+            document.getElementById('filter-start-date').value = '';
+            document.getElementById('filter-end-date').value = '';
+            renderTimeline();
+        }
+
         function renderTimeline() {
             const container = document.getElementById('memory-timeline');
             const entries = JSON.parse(localStorage.getItem('sheep_diary_v3') || '{}');
             const sortedKeys = Object.keys(entries).sort((a,b) => new Date(b) - new Date(a));
             const t = translations[currentLang];
 
+            // 获取日期筛选值
+            const startVal = document.getElementById('filter-start-date').value;
+            const endVal = document.getElementById('filter-end-date').value;
+            const startDate = startVal ? new Date(startVal) : null;
+            const endDate = endVal ? new Date(endVal) : null;
+
             container.innerHTML = '';
 
             let hasContent = false;
 
             sortedKeys.forEach((dateKey, index) => {
+                // 日期筛选逻辑
+                if (startDate || endDate) {
+                    const currentEntryDate = new Date(dateKey);
+                    // 如果设置了开始日期，且当前日期小于开始日期，跳过
+                    if (startDate && currentEntryDate < startDate) return;
+                    // 如果设置了结束日期，且当前日期大于结束日期，跳过
+                    if (endDate && currentEntryDate > endDate) return;
+                }
+
                 const data = entries[dateKey];
                 let contentHtml = '';
 
