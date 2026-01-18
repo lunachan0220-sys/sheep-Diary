@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>绵羊日记 4.3</title>
+    <title>绵羊日记 4.5</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -206,7 +206,7 @@
         .sheep-icon { font-size: 18px; line-height: 1; margin-top: 2px; animation: pop 0.4s ease; }
         .heart-icon { font-size: 16px; line-height: 1; margin-top: 2px; animation: pop 0.5s ease; }
 
-        /* --- 回忆 (Memory) --- */
+        /* --- 回忆 (Memory) Filter --- */
         .filter-bar {
             display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; padding: 0 10px;
         }
@@ -901,16 +901,25 @@
             renderTimeline();
         }
 
+        // 精准日期转换函数
         function parseDate(str) {
             if(!str) return null;
             const p = str.split('-');
+            // 创建本地时间的 00:00:00
             return new Date(p[0], p[1]-1, p[2]);
         }
 
         function renderTimeline() {
             const container = document.getElementById('memory-timeline');
             const entries = JSON.parse(localStorage.getItem('sheep_diary_v3') || '{}');
-            const sortedKeys = Object.keys(entries).sort((a,b) => new Date(b) - new Date(a));
+            
+            // 核心修改：确保排序是倒序（最新的日期在最上面）
+            const sortedKeys = Object.keys(entries).sort((a,b) => {
+                const dateA = parseDate(a);
+                const dateB = parseDate(b);
+                return dateB - dateA; // Descending order
+            });
+            
             const t = translations[currentLang];
 
             const startVal = document.getElementById('filter-start-date').value;
@@ -922,6 +931,7 @@
             let hasContent = false;
 
             sortedKeys.forEach((dateKey, index) => {
+                // 日期筛选
                 if (startDate || endDate) {
                     const currentEntryDate = parseDate(dateKey);
                     if (startDate && currentEntryDate < startDate) return;
@@ -1033,7 +1043,6 @@
 
             currentEditDate = dateKey;
             
-            // 填充内容
             const items = Array.isArray(data.items) ? data.items : [];
             document.getElementById('edit-items').value = items.join('\n');
             document.getElementById('edit-long-diary').value = data.longDiary || '';
@@ -1052,14 +1061,12 @@
             const entries = JSON.parse(localStorage.getItem('sheep_diary_v3') || '{}');
             const t = translations[currentLang];
 
-            // 获取新值
             const itemsVal = document.getElementById('edit-items').value.trim();
             const longDiaryVal = document.getElementById('edit-long-diary').value.trim();
             const reflectVal = document.getElementById('edit-reflect-diary').value.trim();
 
             const newItems = itemsVal ? itemsVal.split('\n').filter(i => i.trim() !== '') : [];
 
-            // 更新数据
             entries[currentEditDate].items = newItems;
             entries[currentEditDate].longDiary = longDiaryVal;
             entries[currentEditDate].reflectionText = reflectVal;
@@ -1068,8 +1075,8 @@
             
             alert(t.editSuccess);
             closeEditModal();
-            renderTimeline(); // 刷新列表
-            renderCalendar(); // 刷新日历（以防万一删空了）
+            renderTimeline(); 
+            renderCalendar(); 
         }
     </script>
 </body>
