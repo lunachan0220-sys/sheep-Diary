@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>绵羊日记</title>
+    <title>绵羊日记 4.3</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -206,7 +206,7 @@
         .sheep-icon { font-size: 18px; line-height: 1; margin-top: 2px; animation: pop 0.4s ease; }
         .heart-icon { font-size: 16px; line-height: 1; margin-top: 2px; animation: pop 0.5s ease; }
 
-        /* --- 回忆 (Memory) Filter --- */
+        /* --- 回忆 (Memory) --- */
         .filter-bar {
             display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; padding: 0 10px;
         }
@@ -245,6 +245,11 @@
         .memory-date { font-size: 14px; font-weight: bold; color: #B0A095; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; }
         .memory-mood { font-size: 16px; animation: pop 0.5s ease; }
         .memory-special { color: var(--special-color); font-size: 14px; }
+        
+        .edit-entry-btn {
+            margin-left: auto; color: #CCC; cursor: pointer; font-size: 14px; padding: 5px;
+        }
+        .edit-entry-btn:hover { color: var(--accent-color); }
 
         .memory-content { 
             background: white; padding: 20px; border-radius: 20px; 
@@ -270,6 +275,29 @@
             display: inline-block; background: #E3F2FD; color: #1565C0;
             font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-bottom: 8px; font-weight: bold;
         }
+
+        /* 编辑弹窗样式 */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+            width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
+            align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background-color: white; padding: 25px; border-radius: 20px;
+            width: 85%; max-width: 400px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .modal-title { font-size: 18px; font-weight: bold; color: #5A4A42; margin-bottom: 15px; }
+        .modal-label { font-size: 12px; color: #9C8E85; margin-bottom: 5px; margin-top: 10px; display: block; }
+        .modal-textarea {
+            width: 100%; border: 1px solid #EEE; border-radius: 10px; padding: 10px;
+            font-size: 14px; font-family: inherit; resize: none; background: #FAFAFA;
+            box-sizing: border-box;
+        }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; }
+        .btn-cancel { background: #EEE; color: #666; }
+        .btn-save-edit { background: var(--accent-color); color: white; }
 
         @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
@@ -408,6 +436,26 @@
         <div id="memory-timeline" class="memory-timeline"></div>
     </div>
 
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title" data-i18n="editTitle">编辑日记 ✏️</div>
+            
+            <span class="modal-label" data-i18n="gratitudeTitle">每日感恩 (一行一件)</span>
+            <textarea id="edit-items" class="modal-textarea" rows="4"></textarea>
+
+            <span class="modal-label" data-i18n="editLongDiary">长日记</span>
+            <textarea id="edit-long-diary" class="modal-textarea" rows="3"></textarea>
+
+            <span class="modal-label" data-i18n="editReflectDiary">反思日记</span>
+            <textarea id="edit-reflect-diary" class="modal-textarea" rows="3"></textarea>
+
+            <div class="modal-buttons">
+                <button class="modal-btn btn-cancel" onclick="closeEditModal()" data-i18n="cancelBtn">取消</button>
+                <button class="modal-btn btn-save-edit" onclick="saveEdit()" data-i18n="saveEditBtn">保存</button>
+            </div>
+        </div>
+    </div>
+
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('journal', this)">
             <i class="fa-solid fa-pen-nib"></i>
@@ -455,7 +503,13 @@
                 alertReflectSaved: "反思日记已保存！",
                 filterDiary: "📅 日记",
                 filterReflection: "🙏 反思",
-                filterSpecial: "💗 特别"
+                filterSpecial: "💗 特别",
+                editTitle: "编辑日记 ✏️",
+                editLongDiary: "长日记",
+                editReflectDiary: "反思日记",
+                cancelBtn: "取消",
+                saveEditBtn: "保存",
+                editSuccess: "修改已保存！"
             },
             "zh-TW": {
                 appTitle: "我的日記",
@@ -487,7 +541,13 @@
                 alertReflectSaved: "反思日記已保存！",
                 filterDiary: "📅 日記",
                 filterReflection: "🙏 反思",
-                filterSpecial: "💗 特別"
+                filterSpecial: "💗 特別",
+                editTitle: "編輯日記 ✏️",
+                editLongDiary: "長日記",
+                editReflectDiary: "反思日記",
+                cancelBtn: "取消",
+                saveEditBtn: "保存",
+                editSuccess: "修改已保存！"
             },
             "en": {
                 appTitle: "My Diary",
@@ -519,7 +579,13 @@
                 alertReflectSaved: "Reflection saved!",
                 filterDiary: "📅 Diary",
                 filterReflection: "🙏 Reflect",
-                filterSpecial: "💗 Special"
+                filterSpecial: "💗 Special",
+                editTitle: "Edit Entry ✏️",
+                editLongDiary: "Long Diary",
+                editReflectDiary: "Reflection Diary",
+                cancelBtn: "Cancel",
+                saveEditBtn: "Save",
+                editSuccess: "Changes saved!"
             }
         };
 
@@ -527,6 +593,7 @@
         let currentDate = new Date();
         let inputCount = 0;
         let currentFilter = 'default';
+        let currentEditDate = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('lang-select').value = currentLang;
@@ -834,11 +901,9 @@
             renderTimeline();
         }
 
-        // 精准日期转换函数
         function parseDate(str) {
             if(!str) return null;
             const p = str.split('-');
-            // 创建本地时间的 00:00:00
             return new Date(p[0], p[1]-1, p[2]);
         }
 
@@ -848,22 +913,17 @@
             const sortedKeys = Object.keys(entries).sort((a,b) => new Date(b) - new Date(a));
             const t = translations[currentLang];
 
-            // 获取输入框的值
             const startVal = document.getElementById('filter-start-date').value;
             const endVal = document.getElementById('filter-end-date').value;
-            
-            // 转换为日期对象
             const startDate = parseDate(startVal);
             const endDate = parseDate(endVal);
 
             container.innerHTML = '';
-
             let hasContent = false;
 
             sortedKeys.forEach((dateKey, index) => {
-                // 精准比较
                 if (startDate || endDate) {
-                    const currentEntryDate = parseDate(dateKey); // 确保格式一致
+                    const currentEntryDate = parseDate(dateKey);
                     if (startDate && currentEntryDate < startDate) return;
                     if (endDate && currentEntryDate > endDate) return;
                 }
@@ -938,6 +998,7 @@
                                 <div class="memory-date">${dateKey}</div>
                                 <div class="memory-mood">${mood}</div>
                                 ${specialIcon}
+                                <i class="fa-solid fa-pen-to-square edit-entry-btn" onclick="openEditModal('${dateKey}')"></i>
                             </div>
                             <div class="memory-content">
                                 ${contentHtml}
@@ -963,6 +1024,56 @@
                 btn.innerText = t.readMore;
             }
         }
+
+        // --- Edit Modal Functions ---
+        function openEditModal(dateKey) {
+            const entries = JSON.parse(localStorage.getItem('sheep_diary_v3') || '{}');
+            const data = entries[dateKey];
+            if (!data) return;
+
+            currentEditDate = dateKey;
+            
+            // 填充内容
+            const items = Array.isArray(data.items) ? data.items : [];
+            document.getElementById('edit-items').value = items.join('\n');
+            document.getElementById('edit-long-diary').value = data.longDiary || '';
+            document.getElementById('edit-reflect-diary').value = data.reflectionText || '';
+
+            document.getElementById('edit-modal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+            currentEditDate = null;
+        }
+
+        function saveEdit() {
+            if (!currentEditDate) return;
+            const entries = JSON.parse(localStorage.getItem('sheep_diary_v3') || '{}');
+            const t = translations[currentLang];
+
+            // 获取新值
+            const itemsVal = document.getElementById('edit-items').value.trim();
+            const longDiaryVal = document.getElementById('edit-long-diary').value.trim();
+            const reflectVal = document.getElementById('edit-reflect-diary').value.trim();
+
+            const newItems = itemsVal ? itemsVal.split('\n').filter(i => i.trim() !== '') : [];
+
+            // 更新数据
+            entries[currentEditDate].items = newItems;
+            entries[currentEditDate].longDiary = longDiaryVal;
+            entries[currentEditDate].reflectionText = reflectVal;
+
+            localStorage.setItem('sheep_diary_v3', JSON.stringify(entries));
+            
+            alert(t.editSuccess);
+            closeEditModal();
+            renderTimeline(); // 刷新列表
+            renderCalendar(); // 刷新日历（以防万一删空了）
+        }
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
